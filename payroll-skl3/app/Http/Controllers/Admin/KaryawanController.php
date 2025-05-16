@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Karyawan;
 use App\Models\User;
+use App\Models\Absensi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Carbon\Carbon;
 
 
 class KaryawanController extends Controller
@@ -109,5 +111,14 @@ class KaryawanController extends Controller
             DB::rollBack();
             return back()->with('error', 'Gagal menghapus karyawan: ' . $e->getMessage());
         }
+    }
+
+    public function dashboardAdmin()
+    {
+        $totalKaryawan = Karyawan::count();
+        $totalAbsensiToday = Absensi::whereDate('tanggal', Carbon::today())->count();
+        $karyawanTerbaru = Karyawan::with('user')->orderBy('created_at', 'desc')->take(5)->get();
+        
+        return view('admin.dashboard', compact('totalKaryawan', 'totalAbsensiToday', 'karyawanTerbaru'));
     }
 }

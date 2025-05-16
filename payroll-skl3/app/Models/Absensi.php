@@ -5,32 +5,25 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Gaji extends Model
+class Absensi extends Model
 {
     use HasFactory;
 
-    protected $table = 'gaji'; // Explicit table name
+    protected $table = 'absensi'; // Nama tabel eksplisit
 
     protected $fillable = [
         'karyawan_id',
-        'bulan',
-        'tahun',
-        'total_hadir',
-        'total_izin',
-        'total_sakit',
-        'total_tanpa_keterangan',
-        'gaji_pokok_saat_itu',
-        'potongan',
-        'gaji_bersih',
-        'keterangan_gaji',
-        'tanggal_pembayaran',
+        'tanggal',
+        'jam_masuk',
+        'jam_pulang',
+        'status',
+        'keterangan',
     ];
 
     protected $casts = [
-        'gaji_pokok_saat_itu' => 'decimal:2',
-        'potongan' => 'decimal:2',
-        'gaji_bersih' => 'decimal:2',
-        'tanggal_pembayaran' => 'date',
+        'tanggal' => 'date',
+        'jam_masuk' => 'datetime',
+        'jam_pulang' => 'datetime',
     ];
 
     public function karyawan()

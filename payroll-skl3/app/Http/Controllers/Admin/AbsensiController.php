@@ -30,4 +30,29 @@ class AbsensiController extends Controller
 
         return view('admin.absensi.rekap', compact('absensi', 'karyawans'));
     }
+
+    public function createOrUpdateAbsensi(Request $request)
+    {
+        $request->validate([
+            'karyawan_id' => 'required|exists:karyawan,id',
+            'tanggal' => 'required|date',
+            'status' => 'required|in:hadir,izin,sakit,tanpa keterangan',
+            'keterangan' => 'nullable|string',
+        ]);
+
+        $absensi = Absensi::updateOrCreate(
+            [
+                'karyawan_id' => $request->karyawan_id,
+                'tanggal' => $request->tanggal,
+            ],
+            [
+                'jam_masuk' => $request->jam_masuk,
+                'jam_pulang' => $request->jam_pulang,
+                'status' => $request->status,
+                'keterangan' => $request->keterangan,
+            ]
+        );
+
+        return redirect()->back()->with('success', 'Data absensi berhasil disimpan.');
+    }
 }

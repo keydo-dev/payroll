@@ -16,6 +16,6 @@ class HomeController extends Controller
                 return redirect()->route('karyawan.dashboard');
             }
         }
-        return view('welcome'); // Atau redirect ke login: return redirect()->route('login.form');
+        return redirect()->route('login.form');
     }
 }

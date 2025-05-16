@@ -1,7 +1,7 @@
 @extends('layouts.auth')
 
 @section('content')
-<form method="POST" action="{{ route('login.submit') }}">
+<form method="POST" action="{{ route('login.submit') }}"> <!-- PERBAIKAN DI SINI -->
     @csrf
     <img class="mb-4" src="https://getbootstrap.com/docs/5.0/assets/brand/bootstrap-logo.svg" alt="" width="72" height="57">
     <h1 class="h3 mb-3 fw-normal">Silakan Login</h1>
@@ -25,11 +25,6 @@
         @enderror
     </div>
 
-    {{-- <div class="checkbox mb-3">
-        <label>
-            <input type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}> Ingat Saya
-        </label>
-    </div> --}}
     <button class="w-100 btn btn-lg btn-primary mt-3" type="submit">Login</button>
     <p class="mt-5 mb-3 text-muted">© {{ date('Y') }}</p>
 </form>
