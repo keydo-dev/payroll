@@ -13,9 +13,9 @@ use App\Http\Controllers\HomeController; // Controller baru untuk landing/redire
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // Authentication Routes
-Route::get('login', [AuthController::class, 'showLoginForm'])->name('login.form');
-Route::post('login', [AuthController::class, 'login'])->name('login.submit');
-Route::post('logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
+Route::get('login', [AuthController::class, 'showLoginForm'])->name('auth.login');
+Route::post('login', [AuthController::class, 'login'])->name('layouts.app');
+Route::post('logout', [AuthController::class, 'logout'])->name('auth.login')->middleware('auth');
 
 // Middleware untuk proteksi route
 Route::middleware(['auth'])->group(function () {

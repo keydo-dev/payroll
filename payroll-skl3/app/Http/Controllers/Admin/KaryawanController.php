@@ -13,32 +13,38 @@ use Illuminate\Validation\Rule;
 
 class KaryawanController extends Controller
 {
-    // app/Http/Controllers/Admin/KaryawanController.php
-    // ...
-    public function dashboardAdmin() // Method baru untuk admin dashboard
+    public function store(Request $request)
     {
-        // Tambahkan data yang relevan untuk dashboard admin jika ada
-        $totalKaryawan = \App\Models\Karyawan::count();
-        return view('admin.dashboard', compact('totalKaryawan'));
-    }
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
+            'nik' => 'required|string|max:20|unique:karyawan',
+            'alamat' => 'nullable|string',
+            'no_telepon' => 'nullable|string|max:15',
+            'posisi' => 'required|string|max:100',
+            'tanggal_masuk' => 'required|date',
+            'gaji_pokok' => 'required|numeric|min:0',
+        ]);
 
-    public function index()
-    {
-        $karyawans = Karyawan::with('user')->latest()->paginate(10);
-        return view('admin.karyawan.index', compact('karyawans'));
-    }
-
-    public function create()
-    {
-        return view('admin.karyawan.create');
-    }
-
-    public function store(Request $request) // Logika Store tetap, tapi redirect dengan pesan
-    {
-        // ... (validasi dan logika store yang sudah ada) ...
         DB::beginTransaction();
         try {
-            // ... (pembuatan user dan karyawan) ...
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'role' => 'karyawan',
+            ]);
+
+            $user->karyawan()->create([
+                'nik' => $request->nik,
+                'alamat' => $request->alamat,
+                'no_telepon' => $request->no_telepon,
+                'posisi' => $request->posisi,
+                'tanggal_masuk' => $request->tanggal_masuk,
+                'gaji_pokok' => $request->gaji_pokok,
+            ]);
+
             DB::commit();
             return redirect()->route('admin.karyawan.index')->with('success', 'Karyawan berhasil ditambahkan.');
         } catch (\Exception $e) {
@@ -47,18 +53,42 @@ class KaryawanController extends Controller
         }
     }
 
-    public function edit(Karyawan $karyawan)
+    public function update(Request $request, Karyawan $karyawan)
     {
-        $karyawan->load('user'); // Pastikan data user ter-load
-        return view('admin.karyawan.edit', compact('karyawan'));
-    }
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($karyawan->user_id)],
+            'password' => 'nullable|string|min:8|confirmed',
+            'nik' => ['required', 'string', 'max:20', Rule::unique('karyawan')->ignore($karyawan->id)],
+            'alamat' => 'nullable|string',
+            'no_telepon' => 'nullable|string|max:15',
+            'posisi' => 'required|string|max:100',
+            'tanggal_masuk' => 'required|date',
+            'gaji_pokok' => 'required|numeric|min:0',
+        ]);
 
-    public function update(Request $request, Karyawan $karyawan) // Logika Update tetap, tapi redirect dengan pesan
-    {
-        // ... (validasi dan logika update yang sudah ada) ...
         DB::beginTransaction();
         try {
-            // ... (update user dan karyawan) ...
+            $userData = [
+                'name' => $request->name,
+                'email' => $request->email,
+            ];
+
+            if ($request->filled('password')) {
+                $userData['password'] = Hash::make($request->password);
+            }
+
+            $karyawan->user->update($userData);
+
+            $karyawan->update([
+                'nik' => $request->nik,
+                'alamat' => $request->alamat,
+                'no_telepon' => $request->no_telepon,
+                'posisi' => $request->posisi,
+                'tanggal_masuk' => $request->tanggal_masuk,
+                'gaji_pokok' => $request->gaji_pokok,
+            ]);
+
             DB::commit();
             return redirect()->route('admin.karyawan.index')->with('success', 'Karyawan berhasil diperbarui.');
         } catch (\Exception $e) {
@@ -67,11 +97,12 @@ class KaryawanController extends Controller
         }
     }
 
-    public function destroy(Karyawan $karyawan) // Logika Destroy tetap, tapi redirect dengan pesan
+    public function destroy(Karyawan $karyawan)
     {
         DB::beginTransaction();
         try {
-            // ... (logika hapus) ...
+            // Delete the user (will cascade delete the karyawan due to foreign key constraint)
+            $karyawan->user->delete();
             DB::commit();
             return redirect()->route('admin.karyawan.index')->with('success', 'Karyawan berhasil dihapus.');
         } catch (\Exception $e) {
