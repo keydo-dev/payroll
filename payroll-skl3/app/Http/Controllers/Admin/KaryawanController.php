@@ -118,7 +118,18 @@ class KaryawanController extends Controller
         $totalKaryawan = Karyawan::count();
         $totalAbsensiToday = Absensi::whereDate('tanggal', Carbon::today())->count();
         $karyawanTerbaru = Karyawan::with('user')->orderBy('created_at', 'desc')->take(5)->get();
-        
+
         return view('admin.dashboard', compact('totalKaryawan', 'totalAbsensiToday', 'karyawanTerbaru'));
+    }
+
+    public function index()
+    {
+        $karyawans = Karyawan::with('user')->latest()->paginate(10);
+        return view('admin.karyawan.index', compact('karyawans'));
+    }
+
+    public function create()
+    {
+        return view('admin.karyawan.create');
     }
 }

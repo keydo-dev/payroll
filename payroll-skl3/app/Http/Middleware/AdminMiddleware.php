@@ -14,6 +14,6 @@ class AdminMiddleware
         if (Auth::check() && Auth::user()->isAdmin()) {
             return $next($request);
         }
-        return response()->json(['message' => 'Unauthorized. Admin access required.'], 403);
+        return redirect()->route('login.form')->with('error', 'Akses tidak diizinkan. Anda harus login sebagai Admin.');
     }
 }

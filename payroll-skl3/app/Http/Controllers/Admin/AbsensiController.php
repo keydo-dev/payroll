@@ -16,7 +16,7 @@ class AbsensiController extends Controller
 
         if ($request->filled('bulan') && $request->filled('tahun')) {
             $query->whereMonth('tanggal', $request->bulan)
-                ->whereYear('tanggal', $request->tahun);
+                  ->whereYear('tanggal', $request->tahun);
         } elseif ($request->filled('tahun')) {
             $query->whereYear('tanggal', $request->tahun);
         }
@@ -26,7 +26,7 @@ class AbsensiController extends Controller
         }
 
         $absensi = $query->orderBy('tanggal', 'desc')->orderBy('karyawan_id')->paginate(20);
-        $karyawans = Karyawan::all(); // For dropdown filter
+        $karyawans = Karyawan::all();
 
         return view('admin.absensi.rekap', compact('absensi', 'karyawans'));
     }
@@ -40,7 +40,7 @@ class AbsensiController extends Controller
             'keterangan' => 'nullable|string',
         ]);
 
-        $absensi = Absensi::updateOrCreate(
+        Absensi::updateOrCreate(
             [
                 'karyawan_id' => $request->karyawan_id,
                 'tanggal' => $request->tanggal,
@@ -54,5 +54,5 @@ class AbsensiController extends Controller
         );
 
         return redirect()->back()->with('success', 'Data absensi berhasil disimpan.');
-    }
+    }
 }
